@@ -1,99 +1,78 @@
-// Zobacz gotowy projekt: https://websamuraj.pl/examples/js/projekt7/
+const gameSummary = {
+    games: 0,
+    wins: 0,
+    losses: 0,
+    draws: 0,
+}
 
-const paper = document.querySelector('[data-option="papier"]');
-const stone = document.querySelector('[data-option="kamień"]');
-const scissors = document.querySelector('[data-option="nożyczki"]');
+const game = {
+    player: "",
+    computer: "",
+}
 
-const play = document.querySelector(".start")
+const signs = [...document.querySelectorAll("img")];
 
-const arrayGame = ['papier', 'kamien', "nożyczki"];
+signs.forEach(sign => {
 
-const numbers = document.querySelector(".numbers span");
+    sign.addEventListener("click", function gamerChoice() {
 
-const wins = document.querySelector(".wins span");
-const losses = document.querySelector(".losses span");
-const draws = document.querySelector(".draws span");
- 
-const yC = document.querySelector('[data-summary="your-choice"]');
-const aI = document.querySelector('[data-summary="ai-choice"]');
+        removeYellowBorder();
+        this.style.boxShadow = "yellow 0 0 0 4px";
+        game.player = this.dataset.option;          
+
+    });
+});
+
 const winner = document.querySelector('[data-summary="who-win"]');
 
-let myChoice;
-let gamesAmount = 1;
-let gamesWin = 1;
-let gamesDraw = 1;
-let gamesLost = 1;
-
-paper.addEventListener("click", (e) => {
-    e.target.classList.add("chosen")
-    console.log("papier")
-    myChoice = e.target.dataset.option;
-
-    scissors.classList.remove("chosen");
-   
-    stone.classList.remove("chosen");
-    
-});
 
 
-stone.addEventListener("click", (e) => {
-    console.log("kamień")
-    myChoice = e.target.dataset.option;
-  
-    e.target.classList.add("chosen")
-    scissors.classList.remove("chosen")
-    paper.classList.remove("chosen")
-    
+document.querySelector(".start").addEventListener("click", (e) => {
 
-});
-
-scissors.addEventListener("click", (e) => {
-    console.log("nożyczki")
-    myChoice = e.target.dataset.option;
-    e.target.classList.add("chosen")
-    paper.classList.remove("chosen")
-    stone.classList.remove("chosen")
-});
+    game.computer = computerChoice();
 
 
-play.addEventListener("click", (e) => {
+    if (!game.player) {
 
-    const randomIndex = Math.floor(Math.random() * 3);
+        alert("Musisz coś wybrać!") 
+        return
 
-    const aiChoice = arrayGame[randomIndex];
-
-    if (aiChoice === myChoice) {
+    } else if (game.player == game.computer) {
+        gameSummary.draws++;
+        document.querySelector(".draws span").textContent = gameSummary.draws;
         winner.textContent = "REMIS";
-        winner.style.color = "grey";
-        draws.textContent = `${gamesDraw++}`;
-       
 
-    } else if (aiChoice == "nożyczki" && myChoice == "papier" || myChoice == "nożyczki" && aiChoice == "kamień" || myChoice == "kamień" && aiChoice == "papier" ) {
-        winner.textContent = "KOMPUTER";
-        winner.style.color = "red";
-        losses.textContent = `${gamesLost++}`;
- 
-    } else if (myChoice == undefined) {
-
-       alert("Wybierz coś!!!")
-       return
+    } else if (game.player == signs[2].dataset.option && game.computer == signs[0].dataset.option || game.player == signs[2].dataset.option && game.computer == signs[1].dataset.option  || game.player == signs[1].dataset.option && game.computer == signs[0].dataset.option) {
+        gameSummary.wins++;
+        document.querySelector(".wins span").textContent = gameSummary.wins;
+        winner.textContent = "GRACZ";
 
     } else {
-        winner.textContent = "GRACZ";
-        winner.style.color = "green";
-        wins.textContent = `${gamesWin++}`;
-        console.log(gamesWin)
-
+        gameSummary.losses++;
+        document.querySelector(".losses span").textContent = gameSummary.losses;
+        winner.textContent = "KOMPUTER";
     }
-    yC.textContent = myChoice;
-    aI.textContent = aiChoice;
+    
+    
 
-    
-    
-    numbers.textContent = `${gamesAmount++}`;
+    document.querySelector('[data-summary="your-choice"]').textContent = game.player;
+    document.querySelector('[data-summary="ai-choice"]').textContent = game.computer;
+
+    document.querySelector(".numbers span").textContent = `${++gameSummary.games}`;
+
+    game.player = undefined;
+
+    removeYellowBorder();
+
 });
 
-// const choiceFunction = (e) => {
-//     myChoice = e.target.dataset.option;
-//     
-// }
+
+const removeYellowBorder = function() {
+
+    signs.forEach(sign => sign.style.boxShadow = "");
+
+}
+
+const computerChoice = function() {
+    return signs[Math.floor(Math.random() * 3)].dataset.option
+}
